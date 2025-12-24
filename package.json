@@ -1,0 +1,31 @@
+{
+  "name": "@roolink/sdk",
+  "version": "1.0.0",
+  "description": "Official Roolink SDK for Node.js and TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "roolink",
+    "akamai",
+    "sensor",
+    "sdk"
+  ],
+  "author": "Roolink",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/roolinkio/roolink-js"
+  },
+  "homepage": "https://github.com/roolinkio/roolink-js#readme",
+  "devDependencies": {
+    "@types/node": "^20.19.27",
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "undici": "^6.0.0"
+  }
+}
