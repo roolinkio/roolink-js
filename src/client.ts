@@ -34,7 +34,6 @@ export class RoolinkClient {
       headers: {
         'x-api-key': this.apiKey,
         'Content-Type': 'application/json',
-        'Accept-Encoding': 'gzip, deflate, br',
       },
       body: JSON.stringify(body),
       bodyTimeout: this.timeout,
