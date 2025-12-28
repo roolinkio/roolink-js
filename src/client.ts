@@ -12,7 +12,7 @@ import {
   SecCptResponse,
   SBSDRequest,
   SBSDResponse,
-  ParseResponse,
+  ScriptData,
 } from './types/web';
 
 const DEFAULT_TIMEOUT = 30000;
@@ -86,10 +86,10 @@ export class RoolinkClient {
     );
   }
 
-  async parseScript(scriptContent: string): Promise<ParseResponse> {
-    return this.makeRequest<ParseResponse>(
+  async parseScript(scriptContent: string): Promise<ScriptData> {
+    return this.makeRequest<ScriptData>(
       `${WEB_BASE_URL}/api/v1/parse`,
-      { scriptContent }
+      scriptContent
     );
   }
 }

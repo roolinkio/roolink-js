@@ -1,6 +1,6 @@
 {
   "name": "@roolink/sdk",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Official Roolink SDK for Node.js and TypeScript",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

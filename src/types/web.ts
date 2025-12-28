@@ -62,7 +62,3 @@ export interface SBSDRequest {
 export interface SBSDResponse {
   body: string;
 }
-
-export interface ParseResponse {
-  scriptData: ScriptData;
-}
