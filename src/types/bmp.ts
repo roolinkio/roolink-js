@@ -2,6 +2,7 @@ export interface BMPSensorRequest {
   app: string;
   proxy: string;
   language?: string;
+  deviceId?: string;
   android?: boolean;
   ipad?: boolean;
 }
