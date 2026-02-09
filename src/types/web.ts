@@ -39,6 +39,7 @@ export interface SecCptRequest {
   timestamp: number;
   nonce: string;
   difficulty: number;
+  count: number;
   timeout?: number;
   cpu?: boolean;
   cookie: string;
