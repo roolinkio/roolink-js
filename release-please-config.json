@@ -1,0 +1,10 @@
+{
+  "bootstrap-sha": "222a1ed0234571897967203b4554be2a9577c994",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "@roolink/sdk",
+      "include-component-in-tag": false
+    }
+  }
+}
