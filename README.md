@@ -20,10 +20,10 @@ Production-ready APIs for generating Akamai sensor data across web and mobile pl
 
 ### 🎯 Supported Services
 
-| Service | Features |
-|---------|----------|
+| Service        | Features                                                   |
+| -------------- | ---------------------------------------------------------- |
 | **🌐 Web API** | Sensor generation, pixel challenges, SBSD, sec-cpt solving |
-| **📱 BMP API** | iOS & Android mobile app sensor generation |
+| **📱 BMP API** | iOS & Android mobile app sensor generation                 |
 
 ---
 
@@ -36,7 +36,7 @@ npm install @roolink/sdk
 ## ⚡ Quick Start
 
 ```typescript
-import { RoolinkClient } from '@roolink/sdk';
+import {RoolinkClient} from '@roolink/sdk';
 
 const client = new RoolinkClient('your-api-key');
 const sensor = await client.generateWebSensor(req);

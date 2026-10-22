@@ -1,8 +1,5 @@
-import { request, Dispatcher } from 'undici';
-import {
-  BMPSensorRequest,
-  BMPSensorResponse,
-} from './types/bmp';
+import {request, Dispatcher} from 'undici';
+import {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
 import {
   WebSensorRequest,
   WebSensorResponse,
@@ -28,8 +25,12 @@ export class RoolinkClient {
     this.timeout = DEFAULT_TIMEOUT;
   }
 
-  private async makeRequest<T>(url: string, body: string, contentType: string): Promise<T> {
-    const { statusCode, body: responseBody } = await request(url, {
+  private async makeRequest<T>(
+    url: string,
+    body: string,
+    contentType: string,
+  ): Promise<T> {
+    const {statusCode, body: responseBody} = await request(url, {
       method: 'POST',
       headers: {
         'x-api-key': this.apiKey,
@@ -54,7 +55,7 @@ export class RoolinkClient {
     return this.makeRequest<BMPSensorResponse>(
       `${BMP_BASE_URL}/api/v1/sensor`,
       JSON.stringify(req),
-      'application/json'
+      'application/json',
     );
   }
 
@@ -63,7 +64,7 @@ export class RoolinkClient {
     return this.makeRequest<WebSensorResponse>(
       `${WEB_BASE_URL}/api/v1/sensor`,
       JSON.stringify(req),
-      'application/json'
+      'application/json',
     );
   }
 
@@ -71,7 +72,7 @@ export class RoolinkClient {
     return this.makeRequest<PixelResponse>(
       `${WEB_BASE_URL}/api/v1/pixel`,
       JSON.stringify(req),
-      'application/json'
+      'application/json',
     );
   }
 
@@ -79,7 +80,7 @@ export class RoolinkClient {
     return this.makeRequest<SecCptResponse>(
       `${WEB_BASE_URL}/api/v1/sec-cpt`,
       JSON.stringify(req),
-      'application/json'
+      'application/json',
     );
   }
 
@@ -87,7 +88,7 @@ export class RoolinkClient {
     return this.makeRequest<SBSDResponse>(
       `${WEB_BASE_URL}/api/v1/sbsd`,
       JSON.stringify(req),
-      'application/json'
+      'application/json',
     );
   }
 
@@ -95,7 +96,7 @@ export class RoolinkClient {
     return this.makeRequest<ScriptData>(
       `${WEB_BASE_URL}/api/v1/parse`,
       scriptContent,
-      'text/plain'
+      'text/plain',
     );
   }
 }

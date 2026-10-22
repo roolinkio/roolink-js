@@ -31,7 +31,6 @@ export interface BMPSensorResponse {
   sdkVersion?: string;
   appVersionCode?: number;
 
-
   // Common fields
   deviceId: string;
   appVersion: string;

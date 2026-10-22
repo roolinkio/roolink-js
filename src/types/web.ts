@@ -1,4 +1,4 @@
-export type ScriptData = Record<string, any>;
+export type ScriptData = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any -- Exported, so narrowing it would break callers.
 
 export interface WebSensorRequest {
   userAgent: string;
