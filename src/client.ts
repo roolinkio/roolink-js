@@ -1,6 +1,6 @@
-import {request, Dispatcher} from 'undici';
-import {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
-import {
+import {request} from 'undici';
+import type {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
+import type {
   WebSensorRequest,
   WebSensorResponse,
   PixelRequest,

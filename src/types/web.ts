@@ -1,4 +1,5 @@
-export type ScriptData = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any -- Exported, so narrowing it would break callers.
+// biome-ignore lint/suspicious/noExplicitAny: Exported, so narrowing it would break callers.
+export type ScriptData = Record<string, any>;
 
 export interface WebSensorRequest {
   userAgent: string;
