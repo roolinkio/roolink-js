@@ -22,7 +22,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/roolinkio/roolink-js"
+    "url": "git+https://github.com/roolinkio/roolink-js.git"
   },
   "homepage": "https://github.com/roolinkio/roolink-js#readme",
   "devDependencies": {
