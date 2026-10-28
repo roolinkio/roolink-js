@@ -1,3 +1,4 @@
+import {gzipSync} from 'node:zlib';
 import {request} from 'undici';
 import type {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
 import type {
@@ -19,24 +20,29 @@ const WEB_BASE_URL = 'https://web.roolink.io';
 export class RoolinkClient {
   private apiKey: string;
   private timeout: number;
+  private compress: boolean;
 
-  constructor(apiKey: string) {
+  /** `compress` sets whether parseScript gzips the script it sends, which it does by default. */
+  constructor(apiKey: string, {compress = true}: {compress?: boolean} = {}) {
     this.apiKey = apiKey;
     this.timeout = DEFAULT_TIMEOUT;
+    this.compress = compress;
   }
 
   private async makeRequest<T>(
     url: string,
     body: string,
     contentType: string,
+    compress = false,
   ): Promise<T> {
     const {statusCode, body: responseBody} = await request(url, {
       method: 'POST',
       headers: {
         'x-api-key': this.apiKey,
         'Content-Type': contentType,
+        ...(compress && {'Content-Encoding': 'gzip'}),
       },
-      body: body,
+      body: compress ? gzipSync(body) : body,
       bodyTimeout: this.timeout,
       headersTimeout: this.timeout,
     });
@@ -97,6 +103,7 @@ export class RoolinkClient {
       `${WEB_BASE_URL}/api/v1/parse`,
       scriptContent,
       'text/plain',
+      this.compress,
     );
   }
 }

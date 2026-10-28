@@ -1,0 +1,36 @@
+const assert = require('node:assert/strict');
+const {test} = require('node:test');
+const {gunzipSync} = require('node:zlib');
+const {MockAgent, setGlobalDispatcher} = require('undici');
+const {RoolinkClient} = require('../dist');
+
+test('compression', async () => {
+  const script = 'var _ac=function(){};';
+  const agent = new MockAgent();
+  agent.disableNetConnect();
+  setGlobalDispatcher(agent);
+
+  // Parses the script with the client, and returns the request it sent.
+  async function send(client) {
+    let sent;
+    agent
+      .get('https://web.roolink.io')
+      .intercept({path: '/api/v1/parse', method: 'POST'})
+      .reply(200, request => {
+        sent = request;
+        return {};
+      });
+    await client.parseScript(script);
+    return sent;
+  }
+
+  const compressed = await send(new RoolinkClient('roo_test'));
+  assert.equal(compressed.headers['Content-Encoding'], 'gzip');
+  assert.equal(gunzipSync(compressed.body).toString(), script);
+
+  const uncompressed = await send(
+    new RoolinkClient('roo_test', {compress: false}),
+  );
+  assert.equal(uncompressed.headers['Content-Encoding'], undefined);
+  assert.equal(uncompressed.body, script);
+});

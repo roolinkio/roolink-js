@@ -9,5 +9,5 @@ This repository is a copy of a package that Roolink develops in a private reposi
 Build and test it with Node.js's own tools:
 
 ```sh
-npm install && npm run build
+npm install && npm run build && npm test
 ```
