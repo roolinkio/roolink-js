@@ -22,14 +22,13 @@ export class RoolinkClient {
   private timeout: number;
   private compress: boolean;
 
-  /** `compress` sets whether parseScript gzips the script it sends, which it does by default. */
+  /** `compress` sets whether parseScript gzips the script payload (enabled by default). */
   constructor(apiKey: string, {compress = true}: {compress?: boolean} = {}) {
     this.apiKey = apiKey;
     this.timeout = DEFAULT_TIMEOUT;
     this.compress = compress;
   }
 
-  /** Posts the body and returns the response body as text. */
   private async send(
     url: string,
     body: string,
@@ -67,7 +66,6 @@ export class RoolinkClient {
     ) as T;
   }
 
-  // BMP API Methods
   async generateBMPSensor(req: BMPSensorRequest): Promise<BMPSensorResponse> {
     return this.makeRequest<BMPSensorResponse>(
       `${BMP_BASE_URL}/api/v1/sensor`,
@@ -76,7 +74,6 @@ export class RoolinkClient {
     );
   }
 
-  // Web API Methods
   async generateWebSensor(req: WebSensorRequest): Promise<WebSensorResponse> {
     return this.makeRequest<WebSensorResponse>(
       `${WEB_BASE_URL}/api/v1/sensor`,

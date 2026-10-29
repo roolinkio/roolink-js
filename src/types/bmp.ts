@@ -17,21 +17,18 @@ export interface BMPSensorResponse {
   sensor: string;
   platform: string;
 
-  // iOS specific fields
   ios?: string;
   kernelOsRelease?: string;
   kernelOsVersion?: string;
   machineId?: string;
   cookies?: Cookie[];
 
-  // Android specific fields
   android?: string;
   deviceModel?: string;
   deviceManufacturer?: string;
   sdkVersion?: string;
   appVersionCode?: number;
 
-  // Common fields
   deviceId: string;
   appVersion: string;
   screenHeight: number;
