@@ -29,12 +29,13 @@ export class RoolinkClient {
     this.compress = compress;
   }
 
-  private async makeRequest<T>(
+  /** Posts the body and returns the response body as text. */
+  private async send(
     url: string,
     body: string,
     contentType: string,
     compress = false,
-  ): Promise<T> {
+  ): Promise<string> {
     const {statusCode, body: responseBody} = await request(url, {
       method: 'POST',
       headers: {
@@ -52,8 +53,18 @@ export class RoolinkClient {
       throw new Error(`API error (status ${statusCode}): ${errorText}`);
     }
 
-    const data = await responseBody.json();
-    return data as T;
+    return responseBody.text();
+  }
+
+  private async makeRequest<T>(
+    url: string,
+    body: string,
+    contentType: string,
+    compress = false,
+  ): Promise<T> {
+    return JSON.parse(
+      await this.send(url, body, contentType, compress),
+    ) as T;
   }
 
   // BMP API Methods
@@ -74,12 +85,14 @@ export class RoolinkClient {
     );
   }
 
+  // /pixel returns the sensor as text/plain, not JSON.
   async generatePixel(req: PixelRequest): Promise<PixelResponse> {
-    return this.makeRequest<PixelResponse>(
+    const sensor = await this.send(
       `${WEB_BASE_URL}/api/v1/pixel`,
       JSON.stringify(req),
       'application/json',
     );
+    return {sensor};
   }
 
   async solveSecCpt(req: SecCptRequest): Promise<SecCptResponse> {

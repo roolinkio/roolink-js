@@ -34,3 +34,21 @@ test('compression', async () => {
   assert.equal(uncompressed.headers['Content-Encoding'], undefined);
   assert.equal(uncompressed.body, script);
 });
+
+test('pixel', async () => {
+  const sensor = 'ap=true&bt=%7B%22charging%22%3Atrue%7D&fonts=null';
+  const agent = new MockAgent();
+  agent.disableNetConnect();
+  setGlobalDispatcher(agent);
+  agent
+    .get('https://web.roolink.io')
+    .intercept({path: '/api/v1/pixel', method: 'POST'})
+    .reply(200, sensor, {headers: {'Content-Type': 'text/plain'}});
+
+  const response = await new RoolinkClient('roo_test').generatePixel({
+    userAgent: 'Mozilla/5.0',
+    bazadebezolkohpepadr: 1,
+    hash: 'abc',
+  });
+  assert.deepEqual(response, {sensor});
+});
