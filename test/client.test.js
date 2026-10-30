@@ -3,6 +3,7 @@ const {test} = require('node:test');
 const {gunzipSync} = require('node:zlib');
 const {MockAgent, setGlobalDispatcher} = require('undici');
 const {RoolinkClient} = require('../dist');
+const {version} = require('../package.json');
 
 test('compression', async () => {
   const script = 'var _ac=function(){};';
@@ -51,4 +52,21 @@ test('pixel', async () => {
     hash: 'abc',
   });
   assert.deepEqual(response, {sensor});
+});
+
+test('user agent', async () => {
+  const agent = new MockAgent();
+  agent.disableNetConnect();
+  setGlobalDispatcher(agent);
+  let sent;
+  agent
+    .get('https://web.roolink.io')
+    .intercept({path: '/api/v1/parse', method: 'POST'})
+    .reply(200, request => {
+      sent = request;
+      return {};
+    });
+
+  await new RoolinkClient('roo_test').parseScript('var _ac=function(){};');
+  assert.equal(sent.headers['User-Agent'], `roolink-js/${version}`);
 });

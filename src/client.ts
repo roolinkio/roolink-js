@@ -1,5 +1,6 @@
 import {gzipSync} from 'node:zlib';
 import {request} from 'undici';
+import {version} from '../package.json';
 import type {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
 import type {
   WebSensorRequest,
@@ -16,6 +17,7 @@ import type {
 const DEFAULT_TIMEOUT = 30000;
 const BMP_BASE_URL = 'https://bmp.roolink.io';
 const WEB_BASE_URL = 'https://web.roolink.io';
+const USER_AGENT = `roolink-js/${version}`;
 
 export class RoolinkClient {
   private apiKey: string;
@@ -40,6 +42,7 @@ export class RoolinkClient {
       headers: {
         'x-api-key': this.apiKey,
         'Content-Type': contentType,
+        'User-Agent': USER_AGENT,
         ...(compress && {'Content-Encoding': 'gzip'}),
       },
       body: compress ? gzipSync(body) : body,
