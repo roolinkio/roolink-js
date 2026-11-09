@@ -1,6 +1,6 @@
 # Roolink TypeScript SDK
 
-Node.js and TypeScript client (`@roolink/sdk`) for the Roolink Akamai Web (`web.roolink.io`), Akamai BMP (`bmp.roolink.io`) and Kasada (`ksd.roolink.io`) APIs.
+Node.js and TypeScript client (`@roolink/sdk`) for the Roolink Akamai Web (`web.roolink.io`), Akamai BMP (`bmp.roolink.io`), Kasada (`ksd.roolink.io`) and Imperva (`imperva.roolink.io`) APIs.
 
 Documentation: https://docs.roolink.io
 
@@ -40,6 +40,8 @@ const {sensor} = await client.generateWebSensor({
 | `generateKasadaPayload(req)` | `POST https://ksd.roolink.io/api/v1/payload` |
 | `generateKasadaCD(req)` | `POST https://ksd.roolink.io/api/v1/cd` |
 | `generateKasadaBotID(req)` | `POST https://ksd.roolink.io/api/v1/botid` |
+| `generateImpervaPayload(req)` | `POST https://imperva.roolink.io/api/v1/payload` |
+| `generateImpervaUTMVC(req)` | `POST https://imperva.roolink.io/api/v1/utmvc` |
 
 ## Kasada
 
@@ -60,6 +62,28 @@ const {payload: cd} = await client.generateKasadaCD({st, ct, domain: 'www.exampl
 const isHuman = JSON.stringify(
   await client.generateKasadaBotID({script: botIdScript}),
 );
+```
+
+## Imperva
+
+`generateImpervaPayload` returns the Reese84 submission as the JSON text the API sent, which the site expects unchanged. Pass `pow` only when the site's GPC request returns a challenge. `generateImpervaUTMVC` takes every cookie the site has set as one `document.cookie` string, including the `incap_ses_*` cookies, and returns the `___utmvc` cookie.
+
+```ts
+const submission = await client.generateImpervaPayload({
+  script: sensorScript,
+  scriptUrl,
+  pageUrl: 'https://www.example.com/',
+  userAgent,
+  language: 'en-US,en;q=0.9',
+  pow: powChallenge || null,
+});
+// Post submission to scriptUrl with d=<host> in the query, and store the token in the reply as the reese84 cookie.
+
+const {cookie} = await client.generateImpervaUTMVC({
+  script: incapsulaScript,
+  cookies: documentCookie,
+  userAgent,
+});
 ```
 
 ## License

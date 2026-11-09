@@ -3,6 +3,11 @@ import {request} from 'undici';
 import {version} from '../package.json';
 import type {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
 import type {
+  ImpervaPayloadRequest,
+  ImpervaUTMVCRequest,
+  ImpervaUTMVCResponse,
+} from './types/imperva';
+import type {
   KasadaBotIDRequest,
   KasadaBotIDResponse,
   KasadaCDRequest,
@@ -26,6 +31,7 @@ const DEFAULT_TIMEOUT = 30000;
 const BMP_BASE_URL = 'https://bmp.roolink.io';
 const WEB_BASE_URL = 'https://web.roolink.io';
 const KASADA_BASE_URL = 'https://ksd.roolink.io';
+const IMPERVA_BASE_URL = 'https://imperva.roolink.io';
 const USER_AGENT = `roolink-js/${version}`;
 
 export class RoolinkClient {
@@ -157,6 +163,26 @@ export class RoolinkClient {
   ): Promise<KasadaBotIDResponse> {
     return this.makeRequest<KasadaBotIDResponse>(
       `${KASADA_BASE_URL}/api/v1/botid`,
+      JSON.stringify(req),
+      'application/json',
+    );
+  }
+
+  // The Reese84 submission is returned as the API sent it, because it must be posted to the challenge endpoint
+  // unchanged.
+  async generateImpervaPayload(req: ImpervaPayloadRequest): Promise<string> {
+    return this.send(
+      `${IMPERVA_BASE_URL}/api/v1/payload`,
+      JSON.stringify(req),
+      'application/json',
+    );
+  }
+
+  async generateImpervaUTMVC(
+    req: ImpervaUTMVCRequest,
+  ): Promise<ImpervaUTMVCResponse> {
+    return this.makeRequest<ImpervaUTMVCResponse>(
+      `${IMPERVA_BASE_URL}/api/v1/utmvc`,
       JSON.stringify(req),
       'application/json',
     );
