@@ -3,6 +3,14 @@ import {request} from 'undici';
 import {version} from '../package.json';
 import type {BMPSensorRequest, BMPSensorResponse} from './types/bmp';
 import type {
+  KasadaBotIDRequest,
+  KasadaBotIDResponse,
+  KasadaCDRequest,
+  KasadaCDResponse,
+  KasadaPayloadRequest,
+  KasadaPayloadResponse,
+} from './types/kasada';
+import type {
   WebSensorRequest,
   WebSensorResponse,
   PixelRequest,
@@ -17,6 +25,7 @@ import type {
 const DEFAULT_TIMEOUT = 30000;
 const BMP_BASE_URL = 'https://bmp.roolink.io';
 const WEB_BASE_URL = 'https://web.roolink.io';
+const KASADA_BASE_URL = 'https://ksd.roolink.io';
 const USER_AGENT = `roolink-js/${version}`;
 
 export class RoolinkClient {
@@ -117,6 +126,39 @@ export class RoolinkClient {
       scriptContent,
       'text/plain',
       this.compress,
+    );
+  }
+
+  // /payload sends the /tl body as base64 inside JSON, so it is decoded here to the bytes /tl expects.
+  async generateKasadaPayload(
+    req: KasadaPayloadRequest,
+  ): Promise<KasadaPayloadResponse> {
+    const {headers, payload} = await this.makeRequest<{
+      headers: Record<string, string>;
+      payload: string;
+    }>(
+      `${KASADA_BASE_URL}/api/v1/payload`,
+      JSON.stringify(req),
+      'application/json',
+    );
+    return {headers, payload: Buffer.from(payload, 'base64')};
+  }
+
+  async generateKasadaCD(req: KasadaCDRequest): Promise<KasadaCDResponse> {
+    return this.makeRequest<KasadaCDResponse>(
+      `${KASADA_BASE_URL}/api/v1/cd`,
+      JSON.stringify(req),
+      'application/json',
+    );
+  }
+
+  async generateKasadaBotID(
+    req: KasadaBotIDRequest,
+  ): Promise<KasadaBotIDResponse> {
+    return this.makeRequest<KasadaBotIDResponse>(
+      `${KASADA_BASE_URL}/api/v1/botid`,
+      JSON.stringify(req),
+      'application/json',
     );
   }
 }
