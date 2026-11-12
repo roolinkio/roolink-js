@@ -246,7 +246,11 @@ test('imperva utmvc', async () => {
       '/api/v1/utmvc',
       `${JSON.stringify(cookie)}\n`,
     );
-    const req = {script: '(function(){})();', cookies, userAgent: 'Mozilla/5.0'};
+    const req = {
+      script: '(function(){})();',
+      cookies,
+      userAgent: 'Mozilla/5.0',
+    };
     const response = await new RoolinkClient('roo_test').generateImpervaUTMVC(
       req,
     );

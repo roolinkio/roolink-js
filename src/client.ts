@@ -79,9 +79,7 @@ export class RoolinkClient {
     contentType: string,
     compress = false,
   ): Promise<T> {
-    return JSON.parse(
-      await this.send(url, body, contentType, compress),
-    ) as T;
+    return JSON.parse(await this.send(url, body, contentType, compress)) as T;
   }
 
   async generateBMPSensor(req: BMPSensorRequest): Promise<BMPSensorResponse> {
