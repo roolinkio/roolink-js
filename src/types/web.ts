@@ -1,6 +1,11 @@
-// biome-ignore lint/suspicious/noExplicitAny: Exported, so narrowing it would break callers.
+/**
+ * The values parseScript reads from an Akamai Web script, which
+ * generateWebSensor needs. Its values stay `any`, because narrowing an exported
+ * type would break callers.
+ */
 export type ScriptData = Record<string, any>;
 
+/** Asks for an Akamai Web sensor. */
 export interface WebSensorRequest {
   userAgent: string;
   flags?: string;
@@ -17,20 +22,24 @@ export interface WebSensorRequest {
   scriptUrl?: string;
 }
 
+/** An Akamai Web sensor to post to the site. */
 export interface WebSensorResponse {
   sensor: string;
 }
 
+/** Asks for an Akamai pixel sensor. */
 export interface PixelRequest {
   userAgent: string;
   bazadebezolkohpepadr: number;
   hash: string;
 }
 
+/** An Akamai pixel sensor. */
 export interface PixelResponse {
   sensor: string;
 }
 
+/** An Akamai sec-cpt challenge to solve. */
 export interface SecCptRequest {
   'sec-cp-challenge'?: string;
   provider?: string;
@@ -46,11 +55,13 @@ export interface SecCptRequest {
   cookie: string;
 }
 
+/** The solved sec-cpt challenge to post to the site. */
 export interface SecCptResponse {
   token: string;
   answers: string[];
 }
 
+/** Asks for an Akamai SBSD payload. */
 export interface SBSDRequest {
   vid: string;
   userAgent: string;
@@ -61,6 +72,7 @@ export interface SBSDRequest {
   script_url?: string;
 }
 
+/** The SBSD request body to post to the site. */
 export interface SBSDResponse {
   body: string;
 }

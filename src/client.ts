@@ -27,22 +27,26 @@ import type {
   ScriptData,
 } from './types/web';
 
-const DEFAULT_TIMEOUT = 30000;
+const DEFAULT_TIMEOUT_MS = 30000;
 const BMP_BASE_URL = 'https://bmp.roolink.io';
 const WEB_BASE_URL = 'https://web.roolink.io';
 const KASADA_BASE_URL = 'https://ksd.roolink.io';
 const IMPERVA_BASE_URL = 'https://imperva.roolink.io';
 const USER_AGENT = `roolink-js/${version}`;
 
+/** Calls the Roolink APIs with one API key. */
 export class RoolinkClient {
-  private apiKey: string;
-  private timeout: number;
-  private compress: boolean;
+  private readonly apiKey: string;
+  private readonly timeoutMs: number;
+  private readonly compress: boolean;
 
-  /** `compress` sets whether parseScript gzips the script payload (enabled by default). */
+  /**
+   * Creates a client that sends `apiKey` with every request. `compress` sets
+   * whether parseScript gzips the script, which it does by default.
+   */
   constructor(apiKey: string, {compress = true}: {compress?: boolean} = {}) {
     this.apiKey = apiKey;
-    this.timeout = DEFAULT_TIMEOUT;
+    this.timeoutMs = DEFAULT_TIMEOUT_MS;
     this.compress = compress;
   }
 
@@ -50,7 +54,7 @@ export class RoolinkClient {
     url: string,
     body: string,
     contentType: string,
-    compress = false,
+    {compress = false}: {compress?: boolean} = {},
   ): Promise<string> {
     const {statusCode, body: responseBody} = await request(url, {
       method: 'POST',
@@ -61,8 +65,8 @@ export class RoolinkClient {
         ...(compress && {'Content-Encoding': 'gzip'}),
       },
       body: compress ? gzipSync(body) : body,
-      bodyTimeout: this.timeout,
-      headersTimeout: this.timeout,
+      bodyTimeout: this.timeoutMs,
+      headersTimeout: this.timeoutMs,
     });
 
     if (statusCode >= 400) {
@@ -77,11 +81,16 @@ export class RoolinkClient {
     url: string,
     body: string,
     contentType: string,
-    compress = false,
+    options: {compress?: boolean} = {},
   ): Promise<T> {
-    return JSON.parse(await this.send(url, body, contentType, compress)) as T;
+    // The API's response for each endpoint has the shape of its response type.
+    const response: T = JSON.parse(
+      await this.send(url, body, contentType, options),
+    );
+    return response;
   }
 
+  /** Returns an Akamai BMP sensor for a mobile app. */
   async generateBMPSensor(req: BMPSensorRequest): Promise<BMPSensorResponse> {
     return this.makeRequest<BMPSensorResponse>(
       `${BMP_BASE_URL}/api/v1/sensor`,
@@ -90,6 +99,7 @@ export class RoolinkClient {
     );
   }
 
+  /** Returns an Akamai Web sensor. */
   async generateWebSensor(req: WebSensorRequest): Promise<WebSensorResponse> {
     return this.makeRequest<WebSensorResponse>(
       `${WEB_BASE_URL}/api/v1/sensor`,
@@ -98,7 +108,7 @@ export class RoolinkClient {
     );
   }
 
-  // /pixel returns the sensor as text/plain, not JSON.
+  /** Returns an Akamai pixel sensor, which the API sends as text, not JSON. */
   async generatePixel(req: PixelRequest): Promise<PixelResponse> {
     const sensor = await this.send(
       `${WEB_BASE_URL}/api/v1/pixel`,
@@ -108,6 +118,7 @@ export class RoolinkClient {
     return {sensor};
   }
 
+  /** Solves an Akamai sec-cpt challenge. */
   async solveSecCpt(req: SecCptRequest): Promise<SecCptResponse> {
     return this.makeRequest<SecCptResponse>(
       `${WEB_BASE_URL}/api/v1/sec-cpt`,
@@ -116,6 +127,7 @@ export class RoolinkClient {
     );
   }
 
+  /** Returns the Akamai SBSD request body to post to the site. */
   async solveSBSD(req: SBSDRequest): Promise<SBSDResponse> {
     return this.makeRequest<SBSDResponse>(
       `${WEB_BASE_URL}/api/v1/sbsd`,
@@ -124,16 +136,20 @@ export class RoolinkClient {
     );
   }
 
+  /** Returns the values a web sensor needs from an Akamai Web script. */
   async parseScript(scriptContent: string): Promise<ScriptData> {
     return this.makeRequest<ScriptData>(
       `${WEB_BASE_URL}/api/v1/parse`,
       scriptContent,
       'text/plain',
-      this.compress,
+      {compress: this.compress},
     );
   }
 
-  // /payload sends the /tl body as base64 inside JSON, so it is decoded here to the bytes /tl expects.
+  /**
+   * Returns the Kasada /tl request. The API sends its body as base64 inside
+   * JSON, so it is decoded here to the bytes /tl expects.
+   */
   async generateKasadaPayload(
     req: KasadaPayloadRequest,
   ): Promise<KasadaPayloadResponse> {
@@ -148,6 +164,7 @@ export class RoolinkClient {
     return {headers, payload: Buffer.from(payload, 'base64')};
   }
 
+  /** Returns the x-kpsdk-cd header value for one protected request. */
   async generateKasadaCD(req: KasadaCDRequest): Promise<KasadaCDResponse> {
     return this.makeRequest<KasadaCDResponse>(
       `${KASADA_BASE_URL}/api/v1/cd`,
@@ -156,6 +173,7 @@ export class RoolinkClient {
     );
   }
 
+  /** Returns the x-is-human header for Vercel BotID. */
   async generateKasadaBotID(
     req: KasadaBotIDRequest,
   ): Promise<KasadaBotIDResponse> {
@@ -166,8 +184,10 @@ export class RoolinkClient {
     );
   }
 
-  // The Reese84 submission is returned as the API sent it, because it must be posted to the challenge endpoint
-  // unchanged.
+  /**
+   * Returns the Reese84 submission as the API sent it, because it must be
+   * posted to the challenge endpoint unchanged.
+   */
   async generateImpervaPayload(req: ImpervaPayloadRequest): Promise<string> {
     return this.send(
       `${IMPERVA_BASE_URL}/api/v1/payload`,
@@ -176,6 +196,7 @@ export class RoolinkClient {
     );
   }
 
+  /** Returns the Imperva ___utmvc cookie. */
   async generateImpervaUTMVC(
     req: ImpervaUTMVCRequest,
   ): Promise<ImpervaUTMVCResponse> {

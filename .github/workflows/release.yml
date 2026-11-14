@@ -1,4 +1,3 @@
-# Publishes each version tag, which arrives with its release commit, to npm with trusted publishing and provenance.
 name: release
 
 on:
@@ -17,12 +16,10 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      # Trusted publishing needs npm 11.5.1 or later, which Node 24 ships.
       - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 24
           registry-url: https://registry.npmjs.org
-          # A publishing job never restores a cache that other runs could have written.
           package-manager-cache: false
       - name: Check the tag matches package.json
         run: test "v$(node -p 'require("./package.json").version')" = "${GITHUB_REF_NAME}"

@@ -1,4 +1,3 @@
-# Builds and tests the package on every pull request and push. It has no lockfile here, so npm resolves package.json's ranges as a consumer's install does.
 name: ci
 
 on:

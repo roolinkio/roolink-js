@@ -5,7 +5,7 @@ const {MockAgent, setGlobalDispatcher} = require('undici');
 const {RoolinkClient} = require('../dist');
 const {version} = require('../package.json');
 
-test('compression', async () => {
+test('parseScript compression', async () => {
   const script = 'var _ac=function(){};';
   const agent = new MockAgent();
   agent.disableNetConnect();
@@ -36,7 +36,7 @@ test('compression', async () => {
   assert.equal(uncompressed.body, script);
 });
 
-test('pixel', async () => {
+test('generatePixel', async () => {
   const sensor = 'ap=true&bt=%7B%22charging%22%3Atrue%7D&fonts=null';
   const agent = new MockAgent();
   agent.disableNetConnect();
@@ -54,7 +54,7 @@ test('pixel', async () => {
   assert.deepEqual(response, {sensor});
 });
 
-test('user agent', async () => {
+test('parseScript user agent', async () => {
   const agent = new MockAgent();
   agent.disableNetConnect();
   setGlobalDispatcher(agent);
@@ -71,8 +71,8 @@ test('user agent', async () => {
   assert.equal(sent.headers['User-Agent'], `roolink-js/${version}`);
 });
 
-// Answers one POST to path on origin with reply and status. The returned object holds the request once the client
-// sends it.
+// Answers one POST to path on origin with reply and status. The returned
+// object holds the request once the client sends it.
 function interceptJSON(origin, path, reply, status = 200) {
   const agent = new MockAgent();
   agent.disableNetConnect();
@@ -98,7 +98,7 @@ function assertJSONRequest(sent, body) {
   assert.deepEqual(JSON.parse(sent.body), body);
 }
 
-test('kasada payload', async () => {
+test('generateKasadaPayload', async () => {
   const sent = interceptJSON(
     'https://ksd.roolink.io',
     '/api/v1/payload',
@@ -122,34 +122,34 @@ test('kasada payload', async () => {
   });
 });
 
-test('kasada cd', async () => {
+test('generateKasadaCD', async t => {
   const cd =
     '{"workTime":1788893087900,"id":"0123456789abcdef0123456789abcdef","answers":[3,7],"duration":2,"d":120,"st":1788893087778,"rst":1788893087898}';
-  for (const req of [
-    {
-      st: 1788893087778,
-      ct: '0aGzYc9d3d1b8f6f4e0e2d7c1b9a5f3e',
-      fc: 'eyJ4IjoxfQ==',
-      domain: 'www.example.com',
-    },
-    {
-      st: 1788893087778,
-      ct: '0aGzYc9d3d1b8f6f4e0e2d7c1b9a5f3e',
-      domain: 'www.example.com',
-    },
+  const session = {
+    st: 1788893087778,
+    ct: '0aGzYc9d3d1b8f6f4e0e2d7c1b9a5f3e',
+    domain: 'www.example.com',
+  };
+  for (const [name, req] of [
+    ['with fc', {...session, fc: 'eyJ4IjoxfQ=='}],
+    ['without fc', session],
   ]) {
-    const sent = interceptJSON(
-      'https://ksd.roolink.io',
-      '/api/v1/cd',
-      JSON.stringify({payload: cd}),
-    );
-    const response = await new RoolinkClient('roo_test').generateKasadaCD(req);
-    assertJSONRequest(sent, req);
-    assert.deepEqual(response, {payload: cd});
+    await t.test(name, async () => {
+      const sent = interceptJSON(
+        'https://ksd.roolink.io',
+        '/api/v1/cd',
+        JSON.stringify({payload: cd}),
+      );
+      const response = await new RoolinkClient('roo_test').generateKasadaCD(
+        req,
+      );
+      assertJSONRequest(sent, req);
+      assert.deepEqual(response, {payload: cd});
+    });
   }
 });
 
-test('kasada botid', async () => {
+test('generateKasadaBotID', async () => {
   const header =
     '{"b":0,"v":0.08084381062192014,"e":"eyJhbGciOiJkaXIiLCJlbmMiOiJBMjU2R0NNIn0..uydqejFMULzuEHyK.Eh2s.aM1k","s":"q+/0Zm9v","d":2,"vr":"3"}';
   const sent = interceptJSON(
@@ -170,12 +170,14 @@ test('kasada botid', async () => {
     d: 2,
     vr: '3',
   });
-  // The x-is-human header is the response serialized back to JSON, which must match what the API sent.
+  // The x-is-human header is the response serialized back to JSON, which must
+  // match what the API sent.
   assert.equal(JSON.stringify(response), header);
 });
 
-test('imperva payload', async () => {
-  // Callers post the submission to Imperva unchanged, so the client must return the text the API sent.
+test('generateImpervaPayload', async t => {
+  // Callers post the submission to Imperva unchanged, so the client must
+  // return the text the API sent.
   const submission =
     '{"solution":{"interrogation":{"p":"AAEC/w==","st":1788893087,"sr":3420118839,"cr":2045817226,"og":2},"version":"stable"},"old_token":null,"error":null,"errors":[],"performance":{"1030820235":41,"4203433130":12,"total":43}}';
   const req = {
@@ -185,22 +187,28 @@ test('imperva payload', async () => {
     userAgent: 'Mozilla/5.0',
     language: 'en-US,en;q=0.9',
   };
-  for (const pow of [{pow: 'eyJjIjoiYWJjIiwiZCI6NH0='}, {}]) {
-    const sent = interceptJSON(
-      'https://imperva.roolink.io',
-      '/api/v1/payload',
-      submission,
-    );
-    const response = await new RoolinkClient('roo_test').generateImpervaPayload(
-      {...req, ...pow},
-    );
-    assertJSONRequest(sent, {...req, ...pow});
-    assert.equal(response, submission);
+  for (const [name, pow] of [
+    ['with pow', {pow: 'eyJjIjoiYWJjIiwiZCI6NH0='}],
+    ['without pow', {}],
+  ]) {
+    await t.test(name, async () => {
+      const sent = interceptJSON(
+        'https://imperva.roolink.io',
+        '/api/v1/payload',
+        submission,
+      );
+      const response = await new RoolinkClient(
+        'roo_test',
+      ).generateImpervaPayload({...req, ...pow});
+      assertJSONRequest(sent, {...req, ...pow});
+      assert.equal(response, submission);
+    });
   }
 });
 
-test('imperva payload error', async () => {
-  // An error body is JSON as well, and posting it to Imperva as a submission would fail without saying why.
+test('generateImpervaPayload error', async () => {
+  // An error body is JSON as well, and posting it to Imperva as a submission
+  // would fail without saying why.
   interceptJSON(
     'https://imperva.roolink.io',
     '/api/v1/payload',
@@ -219,7 +227,7 @@ test('imperva payload error', async () => {
   );
 });
 
-test('imperva utmvc', async () => {
+test('generateImpervaUTMVC', async t => {
   const cookie = {
     name: '___utmvc',
     value:
@@ -237,24 +245,26 @@ test('imperva utmvc', async () => {
     windowKeyCount: 289,
   };
   // The API requires cookies, so an empty document.cookie must still be sent.
-  for (const cookies of [
-    'incap_ses_1234_567890=abc; visid_incap_567890=def',
-    '',
+  for (const [name, cookies] of [
+    ['with cookies', 'incap_ses_1234_567890=abc; visid_incap_567890=def'],
+    ['without cookies', ''],
   ]) {
-    const sent = interceptJSON(
-      'https://imperva.roolink.io',
-      '/api/v1/utmvc',
-      `${JSON.stringify(cookie)}\n`,
-    );
-    const req = {
-      script: '(function(){})();',
-      cookies,
-      userAgent: 'Mozilla/5.0',
-    };
-    const response = await new RoolinkClient('roo_test').generateImpervaUTMVC(
-      req,
-    );
-    assertJSONRequest(sent, req);
-    assert.deepEqual(response, cookie);
+    await t.test(name, async () => {
+      const sent = interceptJSON(
+        'https://imperva.roolink.io',
+        '/api/v1/utmvc',
+        `${JSON.stringify(cookie)}\n`,
+      );
+      const req = {
+        script: '(function(){})();',
+        cookies,
+        userAgent: 'Mozilla/5.0',
+      };
+      const response = await new RoolinkClient('roo_test').generateImpervaUTMVC(
+        req,
+      );
+      assertJSONRequest(sent, req);
+      assert.deepEqual(response, cookie);
+    });
   }
 });
