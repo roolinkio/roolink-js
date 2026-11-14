@@ -1,8 +1,10 @@
 # Roolink TypeScript SDK
 
-Node.js and TypeScript client (`@roolink/sdk`) for the Roolink Akamai Web (`web.roolink.io`), Akamai BMP (`bmp.roolink.io`), Kasada (`ksd.roolink.io`) and Imperva (`imperva.roolink.io`) APIs.
+Node.js and TypeScript client (`@roolink/sdk`) for the Roolink Akamai Web
+(`web.roolink.io`), Akamai BMP (`bmp.roolink.io`), Kasada (`ksd.roolink.io`) and
+Imperva (`imperva.roolink.io`) APIs.
 
-Documentation: https://docs.roolink.io
+Documentation: <https://docs.roolink.io>
 
 ## Install
 
@@ -45,7 +47,10 @@ const {sensor} = await client.generateWebSensor({
 
 ## Kasada
 
-`generateKasadaPayload` decodes the payload from base64, so `payload` is a `Buffer` holding the `/tl` request body. Each protected request needs a new `generateKasadaCD`, whose `payload` is the `x-kpsdk-cd` header value. For Vercel BotID, the `x-is-human` header is `JSON.stringify` of the response.
+`generateKasadaPayload` decodes the payload from base64, so `payload` is a
+`Buffer` holding the `/tl` request body. Each protected request needs a new
+`generateKasadaCD`, whose `payload` is the `x-kpsdk-cd` header value. For Vercel
+BotID, the `x-is-human` header is `JSON.stringify` of the response.
 
 ```ts
 const {headers, payload} = await client.generateKasadaPayload({
@@ -66,7 +71,11 @@ const isHuman = JSON.stringify(
 
 ## Imperva
 
-`generateImpervaPayload` returns the Reese84 submission as the JSON text the API sent, which the site expects unchanged. Pass `pow` only when the site's GPC request returns a challenge. `generateImpervaUTMVC` takes every cookie the site has set as one `document.cookie` string, including the `incap_ses_*` cookies, and returns the `___utmvc` cookie.
+`generateImpervaPayload` returns the Reese84 submission as the JSON text the API
+sent, which the site expects unchanged. Pass `pow` only when the site's GPC
+request returns a challenge. `generateImpervaUTMVC` takes every cookie the site
+has set as one `document.cookie` string, including the `incap_ses_*` cookies,
+and returns the `___utmvc` cookie.
 
 ```ts
 const submission = await client.generateImpervaPayload({
@@ -88,4 +97,4 @@ const {cookie} = await client.generateImpervaUTMVC({
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT - see [LICENSE](LICENSE).
