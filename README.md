@@ -9,12 +9,14 @@ Documentation: <https://docs.roolink.io>
 ## Table of Contents
 
 <!-- toc -->
+
 - [Install](#install)
 - [Usage](#usage)
 - [Methods](#methods)
 - [Kasada](#kasada)
 - [Imperva](#imperva)
 - [License](#license)
+
 <!-- tocstop -->
 
 ## Install
@@ -26,14 +28,14 @@ npm install @roolink/sdk
 ## Usage
 
 ```ts
-import {RoolinkClient} from '@roolink/sdk';
+import { RoolinkClient } from "@roolink/sdk";
 
-const client = new RoolinkClient('your-api-key');
+const client = new RoolinkClient("your-api-key");
 
 const scriptData = await client.parseScript(scriptText);
-const {sensor} = await client.generateWebSensor({
+const { sensor } = await client.generateWebSensor({
   userAgent,
-  url: 'https://example.com/',
+  url: "https://example.com/",
   _abck: abckCookie,
   bm_sz: bmSzCookie,
   scriptData,
@@ -42,19 +44,19 @@ const {sensor} = await client.generateWebSensor({
 
 ## Methods
 
-| Method | Endpoint |
-| --- | --- |
-| `parseScript(scriptText)` | `POST https://web.roolink.io/api/v1/parse` (gzip-compressed by default; pass `{compress: false}` to the constructor to disable) |
-| `generateWebSensor(req)` | `POST https://web.roolink.io/api/v1/sensor` |
-| `generatePixel(req)` | `POST https://web.roolink.io/api/v1/pixel` |
-| `solveSecCpt(req)` | `POST https://web.roolink.io/api/v1/sec-cpt` |
-| `solveSBSD(req)` | `POST https://web.roolink.io/api/v1/sbsd` |
-| `generateBMPSensor(req)` | `POST https://bmp.roolink.io/api/v1/sensor` (`android: false` for iOS, `android: true` for Android) |
-| `generateKasadaPayload(req)` | `POST https://ksd.roolink.io/api/v1/payload` |
-| `generateKasadaCD(req)` | `POST https://ksd.roolink.io/api/v1/cd` |
-| `generateKasadaBotID(req)` | `POST https://ksd.roolink.io/api/v1/botid` |
-| `generateImpervaPayload(req)` | `POST https://imperva.roolink.io/api/v1/payload` |
-| `generateImpervaUTMVC(req)` | `POST https://imperva.roolink.io/api/v1/utmvc` |
+| Method                        | Endpoint                                                                                                                        |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `parseScript(scriptText)`     | `POST https://web.roolink.io/api/v1/parse` (gzip-compressed by default; pass `{compress: false}` to the constructor to disable) |
+| `generateWebSensor(req)`      | `POST https://web.roolink.io/api/v1/sensor`                                                                                     |
+| `generatePixel(req)`          | `POST https://web.roolink.io/api/v1/pixel`                                                                                      |
+| `solveSecCpt(req)`            | `POST https://web.roolink.io/api/v1/sec-cpt`                                                                                    |
+| `solveSBSD(req)`              | `POST https://web.roolink.io/api/v1/sbsd`                                                                                       |
+| `generateBMPSensor(req)`      | `POST https://bmp.roolink.io/api/v1/sensor` (`android: false` for iOS, `android: true` for Android)                             |
+| `generateKasadaPayload(req)`  | `POST https://ksd.roolink.io/api/v1/payload`                                                                                    |
+| `generateKasadaCD(req)`       | `POST https://ksd.roolink.io/api/v1/cd`                                                                                         |
+| `generateKasadaBotID(req)`    | `POST https://ksd.roolink.io/api/v1/botid`                                                                                      |
+| `generateImpervaPayload(req)` | `POST https://imperva.roolink.io/api/v1/payload`                                                                                |
+| `generateImpervaUTMVC(req)`   | `POST https://imperva.roolink.io/api/v1/utmvc`                                                                                  |
 
 ## Kasada
 
@@ -64,19 +66,23 @@ const {sensor} = await client.generateWebSensor({
 BotID, the `x-is-human` header is `JSON.stringify` of the response.
 
 ```ts
-const {headers, payload} = await client.generateKasadaPayload({
+const { headers, payload } = await client.generateKasadaPayload({
   script: ipsScript,
   ipsUrl,
-  language: 'en-US',
-  referer: 'https://www.example.com/',
+  language: "en-US",
+  referer: "https://www.example.com/",
   userAgent,
 });
 // Post payload to /tl with headers, and keep its x-kpsdk-ct and x-kpsdk-st response headers.
 
-const {payload: cd} = await client.generateKasadaCD({st, ct, domain: 'www.example.com'});
+const { payload: cd } = await client.generateKasadaCD({
+  st,
+  ct,
+  domain: "www.example.com",
+});
 
 const isHuman = JSON.stringify(
-  await client.generateKasadaBotID({script: botIdScript}),
+  await client.generateKasadaBotID({ script: botIdScript }),
 );
 ```
 
@@ -92,14 +98,14 @@ and returns the `___utmvc` cookie.
 const submission = await client.generateImpervaPayload({
   script: sensorScript,
   scriptUrl,
-  pageUrl: 'https://www.example.com/',
+  pageUrl: "https://www.example.com/",
   userAgent,
-  language: 'en-US,en;q=0.9',
+  language: "en-US,en;q=0.9",
   pow: powChallenge || null,
 });
 // Post submission to scriptUrl with d=<host> in the query, and store the token in the reply as the reese84 cookie.
 
-const {cookie} = await client.generateImpervaUTMVC({
+const { cookie } = await client.generateImpervaUTMVC({
   script: incapsulaScript,
   cookies: documentCookie,
   userAgent,
